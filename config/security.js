@@ -4,7 +4,7 @@ module.exports.security = {
     allRoutes:        true,
     allowOrigins:     process.env.CORS_ORIGIN || '*',
     allowCredentials: false,
-    allowRequestMethods: 'GET, POST, PATCH, DELETE, OPTIONS',
+    allowRequestMethods: 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     allowRequestHeaders: 'Content-Type, Authorization',
   },
 };

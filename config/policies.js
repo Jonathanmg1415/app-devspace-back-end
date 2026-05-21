@@ -13,5 +13,7 @@ module.exports.policies = {
   'notes/*':     'isAuthenticated',
   'cards/*':     'isAuthenticated',
   'search/*':    'isAuthenticated',
+  'files/*': 'isAuthenticated',
+  'members/*': 'isAuthenticated',
 
 };

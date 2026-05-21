@@ -1,69 +1,79 @@
-var blueprintConfig = require('./local');
+var blueprintConfig = require("./local");
 
-var ROUTE_PREFIX = blueprintConfig.prefix || '';
+var ROUTE_PREFIX = blueprintConfig.prefix || "";
 
 function addGlobalPrefix(routes) {
   var paths = Object.keys(routes);
   var newRoutes = {};
 
-  if (ROUTE_PREFIX === '') return routes;
+  if (ROUTE_PREFIX === "") return routes;
 
   paths.forEach((path) => {
-    var pathParts   = path.split(' ');
-    var uri         = pathParts.pop();
+    var pathParts = path.split(" ");
+    var uri = pathParts.pop();
     var prefixedURI = ROUTE_PREFIX + uri;
     pathParts.push(prefixedURI);
-    newRoutes[pathParts.join(' ')] = routes[path];
+    newRoutes[pathParts.join(" ")] = routes[path];
   });
 
   return newRoutes;
 }
 
 module.exports.routes = addGlobalPrefix({
-
   // ── AUTH ──────────────────────────────────────────────
-  'POST /auth/register': { action: 'auth/register' },
-  'POST /auth/login':    { action: 'auth/login' },
-  'GET  /auth/me':       { action: 'auth/me' },
+  "POST /auth/register": { action: "auth/register" },
+  "POST /auth/login": { action: "auth/login" },
+  "GET  /auth/me": { action: "auth/me" },
 
   // ── PROYECTOS ─────────────────────────────────────────
-  'GET    /projects':     { action: 'projects/get-projects' },
-  'GET    /projects/:id': { action: 'projects/get-project' },
-  'POST   /projects':     { action: 'projects/create-project' },
-  'PUT    /projects/:id': { action: 'projects/edit-project' },
-  'DELETE /projects/:id': { action: 'projects/delete-project' },
+  "GET    /projects": { action: "projects/get-projects" },
+  "GET    /projects/:id": { action: "projects/get-project" },
+  "POST   /projects": { action: "projects/create-project" },
+  "PUT    /projects/:id": { action: "projects/edit-project" },
+  "DELETE /projects/:id": { action: "projects/delete-project" },
 
   // ── TAREAS ────────────────────────────────────────────
-  'GET    /projects/:projectId/tasks': { action: 'tasks/get-tasks' },
-  'POST   /projects/:projectId/tasks': { action: 'tasks/create-tarea' },
-  'PUT    /tasks/:id':                 { action: 'tasks/edit-tarea' },
-  'DELETE /tasks/:id':                 { action: 'tasks/delete-tarea' },
+  "GET    /projects/:projectId/tasks": { action: "tasks/get-tasks" },
+  "POST   /projects/:projectId/tasks": { action: "tasks/create-tarea" },
+  "PUT    /tasks/:id": { action: "tasks/edit-tarea" },
+  "DELETE /tasks/:id": { action: "tasks/delete-tarea" },
 
   // ── LINKS ─────────────────────────────────────────────
-  'GET    /projects/:projectId/links': { action: 'links/get-links' },
-  'POST   /projects/:projectId/links': { action: 'links/create-enlace' },
-  'PUT    /links/:id':                 { action: 'links/edit-enlace' },
-  'DELETE /links/:id':                 { action: 'links/delete-enlace' },
+  "GET    /projects/:projectId/links": { action: "links/get-links" },
+  "POST   /projects/:projectId/links": { action: "links/create-enlace" },
+  "PUT    /links/:id": { action: "links/edit-enlace" },
+  "DELETE /links/:id": { action: "links/delete-enlace" },
 
   // ── COMANDOS ──────────────────────────────────────────
-  'GET    /projects/:projectId/commands': { action: 'commands/get-commands' },
-  'POST   /projects/:projectId/commands': { action: 'commands/create-comando' },
-  'PUT    /commands/:id':                 { action: 'commands/edit-comando' },
-  'DELETE /commands/:id':                 { action: 'commands/delete-comando' },
+  "GET    /projects/:projectId/commands": { action: "commands/get-commands" },
+  "POST   /projects/:projectId/commands": { action: "commands/create-comando" },
+  "PUT    /commands/:id": { action: "commands/edit-comando" },
+  "DELETE /commands/:id": { action: "commands/delete-comando" },
 
   // ── NOTAS ─────────────────────────────────────────────
-  'GET    /projects/:projectId/notes': { action: 'notes/get-notes' },
-  'POST   /projects/:projectId/notes': { action: 'notes/create-nota' },
-  'PUT    /notes/:id':                 { action: 'notes/edit-nota' },
-  'DELETE /notes/:id':                 { action: 'notes/delete-nota' },
+  "GET    /projects/:projectId/notes": { action: "notes/get-notes" },
+  "POST   /projects/:projectId/notes": { action: "notes/create-nota" },
+  "PUT    /notes/:id": { action: "notes/edit-nota" },
+  "DELETE /notes/:id": { action: "notes/delete-nota" },
 
   // ── CARDS ─────────────────────────────────────────────
-  'GET    /projects/:projectId/cards': { action: 'cards/get-cards' },
-  'POST   /projects/:projectId/cards': { action: 'cards/create-card' },
-  'PUT    /cards/:id':                 { action: 'cards/edit-card' },
-  'DELETE /cards/:id':                 { action: 'cards/delete-card' },
+  "GET    /projects/:projectId/cards": { action: "cards/get-cards" },
+  "POST   /projects/:projectId/cards": { action: "cards/create-card" },
+  "PUT    /cards/:id": { action: "cards/edit-card" },
+  "DELETE /cards/:id": { action: "cards/delete-card" },
 
   // ── BÚSQUEDA ──────────────────────────────────────────
-  'GET /search': { action: 'search/global-search' },
-
+  "GET /search": { action: "search/global-search" },
+  // ── FILES ──────────────────────────────────────────────────
+  "GET    /projects/:projectId/files": { action: "files/get-files" },
+  "POST   /projects/:projectId/files": { action: "files/upload-file" },
+  "DELETE /files/:id": { action: "files/delete-file" },
+  // ── MIEMBROS ──────────────────────────────────────────────────
+  "GET    /projects/:projectId/members": { action: "members/get-members" },
+  "POST   /projects/:projectId/members/invite": {
+    action: "members/invite-member",
+  },
+  "DELETE /projects/:projectId/members/:memberId": {
+    action: "members/remove-member",
+  },
 });
