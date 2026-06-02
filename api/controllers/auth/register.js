@@ -1,46 +1,46 @@
-const bcrypt = require('bcryptjs');
-const jwt    = require('jsonwebtoken');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 module.exports = {
-  friendlyName: 'Register',
-  description:  'Registrar un nuevo usuario.',
+  friendlyName: "Register",
+  description: "Registrar un nuevo usuario.",
 
   inputs: {
     name: {
-      type:     'string',
+      type: "string",
       required: true,
     },
     email: {
-      type:     'string',
+      type: "string",
       required: true,
-      isEmail:  true,
+      isEmail: true,
     },
     password: {
-      type:        'string',
-      required:    true,
-      minLength:   6,
+      type: "string",
+      required: true,
+      minLength: 6,
     },
   },
 
   exits: {
     success: {
-      description:  'Usuario creado exitosamente.',
-      responseType: 'ok',
+      description: "Usuario creado exitosamente.",
+      responseType: "ok",
     },
     emailAlreadyInUse: {
-      statusCode:   409,
-      description:  'El email ya está registrado.',
-      responseType: 'conflict',
+      statusCode: 409,
+      description: "El email ya está registrado.",
+      responseType: "badRequest",
     },
     errorGeneral: {
-      statusCode:   500,
-      description:  'Error interno.',
-      responseType: 'serverError',
+      statusCode: 500,
+      description: "Error interno.",
+      responseType: "serverError",
     },
   },
 
   fn: async function ({ name, email, password }, exits) {
-    sails.log.debug('-----> auth/register');
+    sails.log.debug("-----> auth/register");
 
     try {
       const exists = await User.findOne({ email: email.toLowerCase() });
@@ -54,17 +54,15 @@ module.exports = {
         password: hashed,
       }).fetch();
 
-      const token = jwt.sign(
-        { id: user.id },
-        sails.config.custom.jwtSecret,
-        { expiresIn: '7d' }
-      );
+      const token = jwt.sign({ id: user.id }, sails.config.custom.jwtSecret, {
+        expiresIn: "7d",
+      });
 
       const { password: _pwd, ...safeUser } = user;
 
       return exits.success({ token, user: safeUser });
     } catch (error) {
-      sails.log.error('Error en auth/register', error);
+      sails.log.error("Error en auth/register", error);
       return exits.errorGeneral({ mensaje: error.message });
     }
   },
