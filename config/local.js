@@ -11,7 +11,7 @@ module.exports = {
   port: 1337,
 
   custom: {
-    jwtSecret: "dev_secret_change_in_production",
+    jwtSecret: "devspace-secret-palabra",
     supabaseUrl: "https://ghtalxbxhwgccsbooysg.supabase.co",
     supabaseKey:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdodGFseGJ4aHdnY2NzYm9veXNnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTMwNzY4OCwiZXhwIjoyMDk0ODgzNjg4fQ.sedsK2ioxvYLrhVLngjUPyg7XSO2qal4QkeqxeF-ESs",
