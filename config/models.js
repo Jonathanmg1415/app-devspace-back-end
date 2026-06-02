@@ -1,6 +1,6 @@
 module.exports.models = {
   datastore: 'default',
-  migrate:   'safe',
+  migrate:   process.env.NODE_ENV === 'production' ? 'safe' : 'alter',
   attributes: {
     createdAt: { type: 'number', autoCreatedAt: true },
     updatedAt: { type: 'number', autoUpdatedAt: true },

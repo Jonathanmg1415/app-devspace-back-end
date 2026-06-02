@@ -3,4 +3,3 @@ node_modules/
 .tmp/
 .sailsrc.local
 *.log
-config/local.js
