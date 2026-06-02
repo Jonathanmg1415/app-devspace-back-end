@@ -1,5 +1,6 @@
 node_modules/
 .env
+config/local.js
 .tmp/
 .sailsrc.local
 *.log
