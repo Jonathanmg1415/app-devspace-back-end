@@ -23,6 +23,16 @@ module.exports = {
       const isMember = await ProjectMember.findOne({ project: projectId, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
       const item = await Note.create({ ...data, project: projectId, owner: this.req.user.id }).fetch();
+
+      sails.helpers.logActivity({
+        projectId: Number(projectId),
+        actorId:   this.req.user.id,
+        action:    'created',
+        entity:    'note',
+        entityId:  item.id,
+        meta:      { title: item.title },
+      }).catch(() => {});
+
       return exits.success({ nota: item });
     } catch (error) {
       sails.log.error('Error en notes/create-nota', error);

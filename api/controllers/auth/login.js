@@ -48,7 +48,7 @@ module.exports = {
         expiresIn: "7d",
       });
 
-      const { password: _pwd, ...safeUser } = user;
+      const { password: _pwd, reset_token: _rt, reset_token_expiry: _rte, ...safeUser } = user;
 
       return exits.success({ token, user: safeUser });
     } catch (error) {

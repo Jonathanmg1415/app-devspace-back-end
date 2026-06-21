@@ -16,58 +16,73 @@ function addGlobalPrefix(routes) {
 }
 
 module.exports.routes = addGlobalPrefix({
-  // ── AUTH ──────────────────────────────────────────────
-  'POST /auth/register': { action: 'auth/register' },
-  'POST /auth/login':    { action: 'auth/login' },
-  'GET  /auth/me':       { action: 'auth/me' },
+  // AUTH
+  'POST /auth/register':         { action: 'auth/register' },
+  'POST /auth/login':            { action: 'auth/login' },
+  'GET  /auth/me':               { action: 'auth/me' },
+  'PUT  /auth/profile':          { action: 'auth/update-profile' },
+  'POST /auth/forgot-password':  { action: 'auth/forgot-password' },
+  'POST /auth/reset-password':   { action: 'auth/reset-password' },
 
-  // ── PROYECTOS ─────────────────────────────────────────
+  // PROYECTOS
   'GET    /projects':        { action: 'projects/get-projects' },
   'GET    /projects/detail': { action: 'projects/get-project' },
   'POST   /projects':        { action: 'projects/create-project' },
   'PUT    /projects/edit':   { action: 'projects/edit-project' },
   'DELETE /projects/delete': { action: 'projects/delete-project' },
 
-  // ── TAREAS ────────────────────────────────────────────
+  // TAREAS
   'GET    /tasks':        { action: 'tasks/get-tasks' },
   'POST   /tasks':        { action: 'tasks/create-tarea' },
   'PUT    /tasks/edit':   { action: 'tasks/edit-tarea' },
   'DELETE /tasks/delete': { action: 'tasks/delete-tarea' },
 
-  // ── LINKS ─────────────────────────────────────────────
+  // LINKS
   'GET    /links':        { action: 'links/get-links' },
   'POST   /links':        { action: 'links/create-enlace' },
   'PUT    /links/edit':   { action: 'links/edit-enlace' },
   'DELETE /links/delete': { action: 'links/delete-enlace' },
 
-  // ── COMANDOS ──────────────────────────────────────────
+  // COMANDOS
   'GET    /commands':        { action: 'commands/get-commands' },
   'POST   /commands':        { action: 'commands/create-comando' },
   'PUT    /commands/edit':   { action: 'commands/edit-comando' },
   'DELETE /commands/delete': { action: 'commands/delete-comando' },
 
-  // ── NOTAS ─────────────────────────────────────────────
+  // NOTAS
   'GET    /notes':        { action: 'notes/get-notes' },
   'POST   /notes':        { action: 'notes/create-nota' },
   'PUT    /notes/edit':   { action: 'notes/edit-nota' },
   'DELETE /notes/delete': { action: 'notes/delete-nota' },
 
-  // ── CARDS ─────────────────────────────────────────────
+  // CARDS
   'GET    /cards':        { action: 'cards/get-cards' },
   'POST   /cards':        { action: 'cards/create-card' },
   'PUT    /cards/edit':   { action: 'cards/edit-card' },
   'DELETE /cards/delete': { action: 'cards/delete-card' },
 
-  // ── FILES ─────────────────────────────────────────────
+  // FILES
   'GET    /files':        { action: 'files/get-files' },
   'POST   /files/upload': { action: 'files/upload-file' },
   'DELETE /files/delete': { action: 'files/delete-file' },
 
-  // ── MIEMBROS ──────────────────────────────────────────
-  'GET    /members':        { action: 'members/get-members' },
-  'POST   /members/invite': { action: 'members/invite-member' },
-  'DELETE /members/delete': { action: 'members/remove-member' },
+  // MIEMBROS
+  'GET    /members':             { action: 'members/get-members' },
+  'POST   /members/invite':      { action: 'members/invite-member' },
+  'PUT    /members/update-role': { action: 'members/update-member-role' },
+  'DELETE /members/delete':      { action: 'members/remove-member' },
 
-  // ── BÚSQUEDA ──────────────────────────────────────────
+  // BUSQUEDA
   'GET /search': { action: 'search/global-search' },
+
+  // COMENTARIOS
+  'GET    /comments':        { action: 'comments/get-comments' },
+  'POST   /comments':        { action: 'comments/create-comment' },
+  'DELETE /comments/delete': { action: 'comments/delete-comment' },
+
+  // ACTIVIDAD
+  'GET /activity': { action: 'activity/get-activity' },
+
+  // IA - generacion de documentos
+  'POST /ai/generate': { action: 'ai/generate-document' },
 });

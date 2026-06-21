@@ -6,6 +6,7 @@ module.exports = {
     title:       { type: 'string' },
     command:     { type: 'string' },
     description: { type: 'string' },
+    area:        { type: 'string' },
     tags:        { type: 'json' },
   },
   exits: {

@@ -9,5 +9,6 @@ module.exports = {
     tags:        { type: 'json', defaultsTo: [] },
     project:     { model: 'project', required: true },
     owner:       { model: 'user',    required: true },
+    assignee:    { model: 'user' },
   },
 };

@@ -9,6 +9,7 @@ module.exports = {
     priority:    { type: 'string', isIn: ['low','medium','high'], defaultsTo: 'medium' },
     dueDate:     { type: 'ref' },
     tags:        { type: 'json', defaultsTo: [] },
+    assignee:    { type: 'number' },
   },
   exits: {
     success:      { responseType: 'ok' },
@@ -24,7 +25,18 @@ module.exports = {
       const isOwner  = project.owner === this.req.user.id;
       const isMember = await ProjectMember.findOne({ project: projectId, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
-      const item = await Task.create({ ...data, project: projectId, owner: this.req.user.id }).fetch();
+      const created = await Task.create({ ...data, project: projectId, owner: this.req.user.id }).fetch();
+      const item = await Task.findOne({ id: created.id }).populate('assignee');
+
+      sails.helpers.logActivity({
+        projectId: Number(projectId),
+        actorId:   this.req.user.id,
+        action:    'created',
+        entity:    'task',
+        entityId:  item.id,
+        meta:      { title: item.title },
+      }).catch(() => {});
+
       return exits.success({ tarea: item });
     } catch (error) {
       sails.log.error('Error en tasks/create-tarea', error);

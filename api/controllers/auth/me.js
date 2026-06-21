@@ -20,7 +20,7 @@ module.exports = {
     sails.log.debug('-----> auth/me');
 
     try {
-      const { password: _pwd, ...safeUser } = this.req.user;
+      const { password: _pwd, reset_token: _rt, reset_token_expiry: _rte, ...safeUser } = this.req.user;
       return exits.success({ user: safeUser });
     } catch (error) {
       sails.log.error('Error en auth/me', error);

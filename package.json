@@ -9,6 +9,7 @@
     "@supabase/supabase-js": "^2.106.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
+    "groq-sdk": "^1.2.1",
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.14",
@@ -26,7 +27,7 @@
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
-    "dev": "NODE_ENV=development node app.js",
+    "dev": "node app.js",
     "lift": "sails lift"
   },
   "main": "app.js",

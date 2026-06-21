@@ -50,6 +50,15 @@ module.exports = {
         sails.log.warn('Email de invitación no enviado', mailErr.message);
       }
 
+      sails.helpers.logActivity({
+        projectId: Number(projectId),
+        actorId:   this.req.user.id,
+        action:    'invited',
+        entity:    'member',
+        entityId:  target.id,
+        meta:      { userName: target.name, userEmail: target.email },
+      }).catch(() => {});
+
       return exits.success({ member: { ...member, user: safeUser } });
     } catch (error) {
       sails.log.error('Error en members/invite-member', error);
