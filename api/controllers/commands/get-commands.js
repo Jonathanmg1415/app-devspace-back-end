@@ -11,7 +11,7 @@ module.exports = {
     notFound:     { statusCode: 404, responseType: 'notFound' },
     errorGeneral: { statusCode: 500, responseType: 'serverError' },
   },
-  fn: async function ({ projectId }, exits) {
+  fn: async function ({ projectId, limit, skip }, exits) {
     sails.log.debug('-----> commands/get-commands');
     try {
       const project  = await Project.findOne({ id: projectId });
