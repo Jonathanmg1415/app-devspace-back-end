@@ -3,6 +3,8 @@ module.exports = {
   description:  'Listar notes de un proyecto.',
   inputs: {
     projectId: { type: 'string', required: true },
+    limit:     { type: 'number', defaultsTo: 50 },
+    skip:      { type: 'number', defaultsTo: 0 },
   },
   exits: {
     success:      { responseType: 'ok' },
@@ -17,8 +19,11 @@ module.exports = {
       const isOwner  = project.owner === this.req.user.id;
       const isMember = await ProjectMember.findOne({ project: projectId, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
-      const items = await Note.find({ project: projectId }).sort('createdAt DESC');
-      return exits.success({ notes: items });
+      const [items, total] = await Promise.all([
+        Note.find({ project: projectId }).sort('createdAt DESC').limit(limit).skip(skip),
+        Note.count({ project: projectId }),
+      ]);
+      return exits.success({ notes: items, total, hasMore: skip + items.length < total });
     } catch (error) {
       sails.log.error('Error en notes/get-notes', error);
       return exits.errorGeneral({ mensaje: error.message });
