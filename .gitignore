@@ -4,3 +4,5 @@ config/local.js
 .tmp/
 .sailsrc.local
 *.log
+app-devspace-back-end\config\local.js
+config/local.js
