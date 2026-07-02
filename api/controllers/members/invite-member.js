@@ -50,6 +50,16 @@ module.exports = {
         sails.log.warn('Email de invitación no enviado', mailErr.message);
       }
 
+      Notification.create({
+        recipient:  target.id,
+        type:       'project_invitation',
+        title:      `${this.req.user.name} te agregó al proyecto ${project.name}`,
+        body:       'Ya puedes ver y colaborar en este proyecto',
+        entityType: 'project',
+        entityId:   project.id,
+        project:    project.id,
+      }).catch(() => {});
+
       sails.helpers.logActivity({
         projectId: Number(projectId),
         actorId:   this.req.user.id,

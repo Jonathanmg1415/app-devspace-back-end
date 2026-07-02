@@ -31,6 +31,22 @@ module.exports = {
 
       const comment = await TaskComment.findOne({ id: created.id }).populate('author');
 
+      // Notificaciones a quien creó y a quien está asignado (excepto el que comenta)
+      const notifySet = new Set();
+      if (task.createdBy && task.createdBy !== this.req.user.id) notifySet.add(task.createdBy);
+      if (task.assignee  && task.assignee  !== this.req.user.id) notifySet.add(task.assignee);
+      for (const uid of notifySet) {
+        Notification.create({
+          recipient:  uid,
+          type:       'comment_added',
+          title:      `${this.req.user.name} comentó en: ${task.title}`,
+          body:       content.trim().slice(0, 80),
+          entityType: 'task',
+          entityId:   taskId,
+          project:    task.project,
+        }).catch(() => {});
+      }
+
       // Log actividad
       sails.helpers.logActivity({
         projectId: task.project,

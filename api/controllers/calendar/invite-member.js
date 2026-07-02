@@ -26,6 +26,7 @@ module.exports = {
       type:       'calendar_shared',
       title:      `${this.req.user.name} compartió su calendario contigo`,
       body:       'Ya puedes ver sus eventos en tu calendario',
+      entityType: 'calendar',
     }).catch(() => {});
 
     const member = await CalendarMember.findOne({ owner: ownerId, user: target.id }).populate('user');
