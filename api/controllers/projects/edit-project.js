@@ -8,7 +8,7 @@ module.exports = {
     description: { type: 'string' },
     color:       { type: 'string' },
     icon:        { type: 'string' },
-    status:      { type: 'string', isIn: ['active', 'archived'] },
+    status:      { type: 'string', isIn: ['active', 'paused', 'completed', 'archived'] },
   },
 
   exits: {

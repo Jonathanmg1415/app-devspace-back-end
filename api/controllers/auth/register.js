@@ -55,7 +55,7 @@ module.exports = {
       }).fetch();
 
       const token = jwt.sign({ id: user.id }, sails.config.custom.jwtSecret, {
-        expiresIn: "7d",
+        expiresIn: "30d",
       });
 
       const { password: _pwd, ...safeUser } = user;

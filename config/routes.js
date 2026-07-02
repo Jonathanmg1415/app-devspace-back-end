@@ -85,4 +85,25 @@ module.exports.routes = addGlobalPrefix({
 
   // IA - generacion de documentos
   'POST /ai/generate': { action: 'ai/generate-document' },
+
+  // NOTIFICACIONES
+  'GET    /notifications':          { action: 'notifications/get-notifications' },
+  'PUT    /notifications/read':     { action: 'notifications/mark-read' },
+  'PUT    /notifications/read-all': { action: 'notifications/mark-all-read' },
+  'POST   /notifications/seed':     { action: 'notifications/seed-notifications' },
+
+  // DASHBOARD
+  'GET /projects/summary': { action: 'projects/get-summary' },
+
+  // EVENTOS / CALENDARIO
+  'GET    /events':             { action: 'events/get-events' },
+  'POST   /events':             { action: 'events/create-event' },
+  'PUT    /events/edit':        { action: 'events/edit-event' },
+  'DELETE /events/delete':      { action: 'events/delete-event' },
+  'GET    /calendar/members':   { action: 'calendar/get-members' },
+  'POST   /calendar/invite':    { action: 'calendar/invite-member' },
+  'DELETE /calendar/member':    { action: 'calendar/remove-member' },
+
+  // HEALTH
+  'GET /health': { action: 'health/ping' },
 });

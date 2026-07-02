@@ -4,7 +4,7 @@ module.exports = {
     description: { type: 'string', defaultsTo: '' },
     color:       { type: 'string', defaultsTo: '#467886' },
     icon:        { type: 'string', defaultsTo: 'folder' },
-    status:      { type: 'string', isIn: ['active','archived'], defaultsTo: 'active' },
+    status:      { type: 'string', isIn: ['active','paused','completed','archived'], defaultsTo: 'active' },
     owner:       { model: 'user', required: true },
     tasks:       { collection: 'task',    via: 'project' },
     links:       { collection: 'link',    via: 'project' },

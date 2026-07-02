@@ -5,8 +5,9 @@ module.exports = {
   description:  'Actualizar nombre y/o contraseña del usuario autenticado.',
 
   inputs: {
-    name:        { type: 'string' },
-    newPassword: { type: 'string', minLength: 6 },
+    name:            { type: 'string' },
+    avatar:          { type: 'string', allowNull: true },
+    newPassword:     { type: 'string', minLength: 6 },
     currentPassword: { type: 'string' },
   },
 
@@ -16,13 +17,14 @@ module.exports = {
     errorGeneral:    { statusCode: 500, responseType: 'serverError' },
   },
 
-  fn: async function ({ name, newPassword, currentPassword }, exits) {
+  fn: async function ({ name, avatar, newPassword, currentPassword }, exits) {
     sails.log.debug('-----> auth/update-profile');
     try {
       const user = await User.findOne({ id: this.req.user.id });
       const updates = {};
 
       if (name && name.trim()) updates.name = name.trim();
+      if (avatar !== undefined) updates.avatar = avatar || null;
 
       if (newPassword) {
         if (!currentPassword) return exits.wrongPassword({ error: 'Se requiere la contraseña actual.' });

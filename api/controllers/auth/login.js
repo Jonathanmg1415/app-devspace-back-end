@@ -45,7 +45,7 @@ module.exports = {
       if (!match) return exits.invalidCredentials();
 
       const token = jwt.sign({ id: user.id }, sails.config.custom.jwtSecret, {
-        expiresIn: "7d",
+        expiresIn: "30d",
       });
 
       const { password: _pwd, reset_token: _rt, reset_token_expiry: _rte, ...safeUser } = user;
