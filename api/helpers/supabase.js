@@ -1,14 +1,44 @@
+const https = require('https');
+const { URL } = require('url');
+
+function request(method, urlStr, body, extraHeaders) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(urlStr);
+    const isBuffer = Buffer.isBuffer(body);
+    const bodyBuf  = body
+      ? (isBuffer ? body : Buffer.from(typeof body === 'string' ? body : JSON.stringify(body)))
+      : null;
+
+    const options = {
+      hostname: u.hostname,
+      port:     443,
+      path:     u.pathname + u.search,
+      method,
+      headers:  {
+        ...extraHeaders,
+        ...(bodyBuf ? { 'Content-Length': bodyBuf.length } : {}),
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve({ ok: res.statusCode < 300, status: res.statusCode, body: Buffer.concat(chunks).toString() }));
+    });
+
+    req.on('error', reject);
+    if (bodyBuf) req.write(bodyBuf);
+    req.end();
+  });
+}
+
 module.exports = {
   friendlyName: 'Supabase storage client',
-  description:  'Retorna un cliente de Supabase Storage usando fetch nativo (sin SDK).',
+  description:  'Cliente de Supabase Storage usando https nativo (sin SDK, sin undici).',
 
   sync: true,
-
   inputs: {},
-
-  exits: {
-    success: { outputType: 'ref' },
-  },
+  exits: { success: { outputType: 'ref' } },
 
   fn: function (_inputs, exits) {
     const url = sails.config.custom.supabaseUrl;
@@ -18,7 +48,7 @@ module.exports = {
       throw new Error('Supabase no configurado: verifica SUPABASE_URL y SUPABASE_SERVICE_KEY en las variables de entorno');
     }
 
-    const headers = {
+    const authHeaders = {
       apikey:        key,
       Authorization: `Bearer ${key}`,
     };
@@ -27,35 +57,23 @@ module.exports = {
       from(bucket) {
         return {
           async upload(path, buffer, opts) {
-            const res = await fetch(
+            const res = await request(
+              'POST',
               `${url}/storage/v1/object/${bucket}/${path}`,
-              {
-                method:  'POST',
-                headers: { ...headers, 'Content-Type': opts?.contentType || 'application/octet-stream' },
-                body:    buffer,
-              }
+              buffer,
+              { ...authHeaders, 'Content-Type': opts?.contentType || 'application/octet-stream' }
             );
-            if (!res.ok) {
-              const msg = await res.text();
-              return { error: { message: msg } };
-            }
-            return { error: null };
+            return res.ok ? { error: null } : { error: { message: res.body } };
           },
 
           async remove(paths) {
-            const res = await fetch(
+            const res = await request(
+              'DELETE',
               `${url}/storage/v1/object/${bucket}`,
-              {
-                method:  'DELETE',
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ prefixes: paths }),
-              }
+              JSON.stringify({ prefixes: paths }),
+              { ...authHeaders, 'Content-Type': 'application/json' }
             );
-            if (!res.ok) {
-              const msg = await res.text();
-              return { error: { message: msg } };
-            }
-            return { error: null };
+            return res.ok ? { error: null } : { error: { message: res.body } };
           },
 
           getPublicUrl(path) {
