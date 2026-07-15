@@ -52,11 +52,11 @@ module.exports = {
     try {
       if (!projectId) return exits.notFound();
 
-      const project = await Project.findOne({
-        id: projectId,
-        owner: this.req.user.id,
-      });
+      const project = await Project.findOne({ id: projectId });
       if (!project) return exits.notFound();
+      const isOwner  = project.owner === this.req.user.id;
+      const isMember = await ProjectMember.findOne({ project: projectId, user: this.req.user.id });
+      if (!isOwner && !isMember) return exits.notFound();
 
       const upload = await new Promise((resolve, reject) => {
         this.req

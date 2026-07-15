@@ -15,6 +15,7 @@ module.exports = {
       const file = await File.findOne({ id });
       if (!file) return exits.notFound();
       const project  = await Project.findOne({ id: file.project });
+      if (!project) return exits.notFound();
       const isOwner  = project.owner === this.req.user.id;
       const isMember = await ProjectMember.findOne({ project: file.project, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();

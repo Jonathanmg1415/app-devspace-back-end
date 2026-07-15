@@ -10,9 +10,9 @@ module.exports = {
     dueDate:        { type: 'ref' },
     tags:           { type: 'json',   defaultsTo: [] },
     checklist:      { type: 'json',   defaultsTo: [] },
-    estimatedHours: { type: 'number' },
+    estimatedHours: { type: 'number', allowNull: true },
     recurrence:     { type: 'string', isIn: ['daily','weekly','monthly'], allowNull: true },
-    assignee:       { type: 'number' },
+    assignee:       { type: 'number', allowNull: true },
   },
   exits: {
     success:      { responseType: 'ok' },
