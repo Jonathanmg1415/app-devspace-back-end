@@ -18,7 +18,9 @@ module.exports = {
     try {
       const comment = await TaskComment.findOne({ id });
       if (!comment) return exits.notFound();
-      if (comment.author !== this.req.user.id) return exits.forbidden();
+      // comment.author viene como string porque task_comment.author es bigint en la
+      // base (a diferencia del resto de las tablas, que usan integer) — comparar con Number().
+      if (Number(comment.author) !== Number(this.req.user.id)) return exits.forbidden();
       await TaskComment.destroyOne({ id });
       return exits.success({ ok: true });
     } catch (error) {

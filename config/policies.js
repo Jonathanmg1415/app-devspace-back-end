@@ -3,5 +3,6 @@ module.exports.policies = {
   'auth/login':           true,
   'auth/forgot-password': true,
   'auth/reset-password':  true,
+  'health/ping':          true,
   '*':                    'isAuthenticated',
 };

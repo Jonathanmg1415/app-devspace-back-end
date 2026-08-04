@@ -1,5 +1,3 @@
-const Groq = require('groq-sdk');
-
 module.exports = {
   friendlyName: 'Generate document',
   description:  'Generar contenido con IA (Groq) basado en un prompt.',
@@ -16,28 +14,22 @@ module.exports = {
   fn: async function ({ prompt, docType, context }, exits) {
     sails.log.debug('-----> ai/generate-document');
     try {
-      const apiKey = process.env.GROQ_API_KEY;
-      if (!apiKey) return exits.notConfigured({ mensaje: 'GROQ_API_KEY no configurada.' });
-
-      const groq = new Groq({ apiKey });
-
       const systemPrompt = buildSystemPrompt(docType);
       const userPrompt   = context
         ? `Contexto adicional:\n${context}\n\nSolicitud: ${prompt}`
         : prompt;
 
-      const completion = await groq.chat.completions.create({
-        model:      'llama-3.1-8b-instant',
-        max_tokens: 1500,
+      const content = await sails.helpers.groq.with({
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user',   content: userPrompt },
         ],
       });
 
-      const content = completion.choices[0]?.message?.content || '';
       return exits.success({ content });
     } catch (err) {
+      if (err.exit === 'notConfigured') return exits.notConfigured({ mensaje: 'GROQ_API_KEY no configurada.' });
       sails.log.error('Error en ai/generate-document', err);
       return exits.errorGeneral({ mensaje: err.message });
     }

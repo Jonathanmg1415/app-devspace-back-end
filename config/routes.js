@@ -32,6 +32,7 @@ module.exports.routes = addGlobalPrefix({
   'DELETE /projects/delete': { action: 'projects/delete-project' },
 
   // TAREAS
+  'POST   /tasks/extract': { action: 'tasks/extract-from-file' },
   'GET    /tasks/mine':   { action: 'tasks/get-my-tasks' },
   'GET    /tasks':        { action: 'tasks/get-tasks' },
   'POST   /tasks':        { action: 'tasks/create-tarea' },

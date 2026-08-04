@@ -29,7 +29,15 @@ module.exports = {
         content: content.trim(),
       }).fetch();
 
-      const comment = await TaskComment.findOne({ id: created.id }).populate('author');
+      // task_comment.id/task son bigint en la base (a diferencia del resto de las tablas)
+      // y el autor ya lo tenemos en mano — evitamos .populate('author'), que falla por el
+      // mismatch de tipo bigint-string vs el integer de user.id.
+      const comment = {
+        ...created,
+        id:     Number(created.id),
+        task:   Number(created.task),
+        author: this.req.user,
+      };
 
       // Notificaciones a quien creó y a quien está asignado (excepto el que comenta)
       const notifySet = new Set();
@@ -48,14 +56,14 @@ module.exports = {
       }
 
       // Log actividad
-      sails.helpers.logActivity({
-        projectId: task.project,
+      sails.helpers.logActivity.with({
+        projectId: Number(task.project),
         actorId:   this.req.user.id,
         action:    'commented',
         entity:    'task',
         entityId:  taskId,
         meta:      { taskTitle: task.title },
-      }).catch(() => {});
+      }).catch((err) => sails.log.warn('logActivity falló (ignorado):', err.message));
 
       return exits.success({ comment });
     } catch (error) {

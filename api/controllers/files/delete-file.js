@@ -19,9 +19,7 @@ module.exports = {
       const isOwner  = project.owner === this.req.user.id;
       const isMember = await ProjectMember.findOne({ project: file.project, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
-      const supabase = sails.helpers.supabase();
-      const { error: storageError } = await supabase.storage.from(file.bucket).remove([file.name]);
-      if (storageError) sails.log.warn('Error al eliminar de storage', storageError.message);
+      await sails.helpers.deleteFileStorage.with({ files: [{ bucket: file.bucket, name: file.name }] });
       await File.destroyOne({ id });
       return exits.success({ mensaje: 'Archivo eliminado correctamente.' });
     } catch (error) {

@@ -24,14 +24,14 @@ module.exports = {
       if (!isOwner && !isMember) return exits.notFound();
       const item = await Note.create({ ...data, project: projectId, owner: this.req.user.id }).fetch();
 
-      sails.helpers.logActivity({
+      sails.helpers.logActivity.with({
         projectId: Number(projectId),
         actorId:   this.req.user.id,
         action:    'created',
         entity:    'note',
         entityId:  item.id,
         meta:      { title: item.title },
-      }).catch(() => {});
+      }).catch((err) => sails.log.warn('logActivity falló (ignorado):', err.message));
 
       return exits.success({ nota: item });
     } catch (error) {

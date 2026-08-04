@@ -60,14 +60,14 @@ module.exports = {
         project:    project.id,
       }).catch(() => {});
 
-      sails.helpers.logActivity({
+      sails.helpers.logActivity.with({
         projectId: Number(projectId),
         actorId:   this.req.user.id,
         action:    'invited',
         entity:    'member',
         entityId:  target.id,
         meta:      { userName: target.name, userEmail: target.email },
-      }).catch(() => {});
+      }).catch((err) => sails.log.warn('logActivity falló (ignorado):', err.message));
 
       return exits.success({ member: { ...member, user: safeUser } });
     } catch (error) {

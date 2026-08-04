@@ -1,214 +1,116 @@
-# DevSpace — Frontend
+# DevSpace — Backend
 
-> El workspace que los desarrolladores siempre quisieron tener.
+> API de DevSpace: proyectos, tareas, notas, comandos, links, cards, archivos y colaboración en equipo.
 
-DevSpace es una aplicación web enfocada en desarrolladores de software. Centraliza en un solo lugar los proyectos, tareas, enlaces, comandos y notas que normalmente viven dispersos entre múltiples herramientas.
+Backend en Sails.js sobre PostgreSQL (hosteado en Supabase), con storage de archivos también en Supabase y emails transaccionales vía Resend.
 
 ---
 
 ## Stack
 
-| Tecnología | Versión | Rol |
-|---|---|---|
-| [Vue 3](https://vuejs.org/) | ^3.x | Framework principal |
-| [Quasar](https://quasar.dev/) | ^2.x | UI components + build tooling |
-| [Vite](https://vitejs.dev/) | ^5.x | Dev server y bundler |
-| [Pinia](https://pinia.vuejs.org/) | ^2.x | Estado global |
-| [Vue Router 4](https://router.vuejs.org/) | ^4.x | Enrutamiento |
-| [vue-i18n](https://vue-i18n.intlify.dev/) | ^9.x | Internacionalización |
-| [Axios](https://axios-http.com/) | ^1.x | Cliente HTTP |
+| Tecnología | Rol |
+|---|---|
+| [Sails.js](https://sailsjs.com/) | Framework MVC sobre Express |
+| [sails-postgresql](https://github.com/balderdashy/sails-postgresql) | Adapter de base de datos |
+| PostgreSQL (Supabase) | Base de datos |
+| Supabase Storage | Almacenamiento de archivos |
+| [Resend](https://resend.com/) | Envío de emails (invitaciones, recuperación de contraseña) |
+| [Groq](https://groq.com/) | IA (generación de documentos, extracción de tareas desde archivos) |
+| JWT (`jsonwebtoken`) | Autenticación |
+
+Groq y Resend se consumen con `https` nativo de Node (`api/helpers/groq.js`, `api/helpers/mailer.js`), no con sus SDKs oficiales — el `undici` interno de Node choca con ambos SDKs. Supabase Storage sigue el mismo patrón (`api/helpers/supabase.js`).
 
 ---
 
 ## Requisitos
 
-- Node.js >= 18
-- npm >= 9 (o yarn / pnpm)
-- Quasar CLI instalado globalmente
-
-```bash
-npm install -g @quasar/cli
-```
+- Node.js `^22.22`
+- Una base de datos PostgreSQL (Supabase u otra)
 
 ---
 
 ## Instalación
 
 ```bash
-# Clonar el repositorio
-git clone https://github.com/tu-org/devspace-frontend.git
-cd devspace-frontend
-
-# Instalar dependencias
 npm install
+cp .env.example .env
+# completar .env con tus credenciales (ver más abajo)
 ```
+
+---
+
+## Correr en local
+
+```bash
+npm run dev
+```
+
+**Importante:** usar `npm run dev` (`node app.js`), **no `sails lift` directo**. `app.js` carga `.env` vía `dotenv` antes de levantar Sails; `sails lift` no pasa por `app.js` y por lo tanto nunca carga el `.env` — cualquier feature que dependa de esas variables (Supabase, Resend, Groq) fallará silenciosamente si se usa `sails lift`.
+
+El servidor queda en `http://localhost:1337`, con todas las rutas bajo el prefijo `/api` (ver más abajo).
 
 ---
 
 ## Variables de entorno
 
-Crea un archivo `.env` en la raíz del proyecto basándote en `.env.example`:
+Ver `.env.example` para la lista completa. Las más importantes:
 
-```bash
-cp .env.example .env
-```
-
-```env
-# URL base de la API (Sails.js backend)
-VITE_API_BASE_URL=http://localhost:1337
-
-# Entorno
-VITE_APP_ENV=development
-```
-
-> En producción esta variable apunta al backend desplegado en Render.
-
----
-
-## Desarrollo
-
-```bash
-# Iniciar servidor de desarrollo con hot-reload
-quasar dev
-```
-
-La app estará disponible en `http://localhost:9000`.
-
----
-
-## Build de producción
-
-```bash
-# Generar build optimizado en /dist/spa
-quasar build
-```
-
-El output es una SPA estática lista para desplegar en Vercel, Netlify o cualquier CDN.
-
----
-
-## Despliegue (Vercel)
-
-El proyecto se despliega automáticamente en [Vercel](https://vercel.com/) al hacer push a `main`.
-
-Configuración del proyecto en Vercel:
-
-| Campo | Valor |
+| Variable | Uso |
 |---|---|
-| Framework Preset | `Other` |
-| Build Command | `quasar build` |
-| Output Directory | `dist/spa` |
-| Install Command | `npm install` |
+| `DATABASE_URL` | Conexión a Postgres |
+| `JWT_SECRET` | Firma de tokens de auth |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` / `SUPABASE_BUCKET` | Storage de archivos |
+| `RESEND_API_KEY` / `FROM_EMAIL` / `RESEND_OWNER_EMAIL` | Envío de emails (con `onboarding@resend.dev` los emails se redirigen a `RESEND_OWNER_EMAIL`, limitación del free tier de Resend) |
+| `GROQ_API_KEY` | IA (documentos, extracción de tareas) |
+| `APP_URL` | URL del frontend, usada en links de emails |
 
-Agrega las variables de entorno desde el dashboard de Vercel (`Settings → Environment Variables`).
+⚠️ No hay base de datos de desarrollo separada: `DATABASE_URL` apunta siempre a la base real. Tenerlo en cuenta al probar cosas localmente.
 
 ---
 
-## Estructura del proyecto
+## Regla crítica: migraciones
+
+`config/models.js` tiene `migrate: 'safe'` — Sails **nunca** crea ni altera tablas automáticamente al levantar. Cualquier cambio de campo/modelo necesita el SQL correspondiente corrido a mano en Supabase.
+
+---
+
+## Estructura
 
 ```
-devspace-frontend/
-├── public/                 # Assets estáticos
-├── src/
-│   ├── assets/             # Imágenes, íconos, fuentes
-│   ├── boot/               # Plugins de arranque (axios, i18n, pinia)
-│   │   ├── axios.js
-│   │   └── i18n.js
-│   ├── components/         # Componentes reutilizables
-│   │   ├── cards/          # Cards arrastrables
-│   │   ├── commands/       # Módulo de comandos
-│   │   ├── links/          # Módulo de enlaces
-│   │   ├── notes/          # Notas y secciones
-│   │   └── tasks/          # Kanban de tareas
-│   ├── layouts/
-│   │   └── MainLayout.vue  # Layout principal con sidebar
-│   ├── pages/
-│   │   ├── auth/           # Login, registro
-│   │   ├── projects/       # Vista de proyectos
-│   │   ├── tasks/          # Kanban
-│   │   ├── links/          # Gestión de enlaces
-│   │   ├── commands/       # Snippets CLI
-│   │   ├── notes/          # Notas / secciones
-│   │   ├── cards/          # Cards arrastrables
-│   │   └── search/         # Búsqueda global
-│   ├── router/
-│   │   └── index.js        # Definición de rutas y guards
-│   ├── stores/             # Stores de Pinia
-│   │   ├── auth.js
-│   │   ├── projects.js
-│   │   ├── tasks.js
-│   │   ├── links.js
-│   │   ├── commands.js
-│   │   └── search.js
-│   ├── services/           # Llamadas a la API (por módulo)
-│   │   ├── auth.service.js
-│   │   ├── projects.service.js
-│   │   └── ...
-│   ├── composables/        # Lógica reutilizable (useSearch, useDragDrop…)
-│   ├── i18n/               # Traducciones
-│   │   ├── es/
-│   │   └── en/
-│   └── css/
-│       ├── app.scss
-│       └── quasar.variables.scss   # Colores y tokens del tema
-├── .env.example
-├── quasar.config.js
-└── vite.config.js
+app-devspace-back-end/
+├── api/
+│   ├── controllers/       # Un archivo por acción, agrupados por dominio
+│   │   ├── auth/
+│   │   ├── projects/
+│   │   ├── tasks/          # incluye extract-from-file.js (IA)
+│   │   ├── notes/ links/ commands/ cards/ files/
+│   │   ├── members/ comments/ activity/ events/ calendar/
+│   │   ├── notifications/ search/ ai/ health/
+│   ├── models/             # Un modelo Waterline por tabla
+│   ├── policies/           # isAuthenticated.js — JWT bearer
+│   └── helpers/            # groq.js, mailer.js, supabase.js, delete-file-storage.js, log-activity.js
+├── config/
+│   ├── routes.js           # Rutas explícitas, prefijo /api vía config/local.js
+│   ├── policies.js         # Mapeo de políticas por acción
+│   ├── models.js           # migrate: 'safe', defaults de id/timestamps
+│   └── local.js            # prefix: '/api' — no es solo config de máquina, viaja con el repo
+└── app.js                  # Entry point real (carga dotenv, luego sails.lift())
 ```
 
 ---
 
-## Módulos de la aplicación
+## Prefijo de rutas
 
-| Módulo | Ruta | Descripción |
-|---|---|---|
-| Proyectos | `/projects` | Lista y gestión de proyectos del usuario |
-| Tareas | `/projects/:id/tasks` | Kanban con drag & drop por proyecto |
-| Links | `/projects/:id/links` | Repositorio de URLs por proyecto |
-| Comandos | `/projects/:id/commands` | Snippets CLI con copia en un clic |
-| Notas | `/projects/:id/notes` | Bloques de texto libre por sección |
-| Cards | `/projects/:id/cards` | Notas rápidas arrastrables |
-| Búsqueda | `/search` | Búsqueda global sobre todos los módulos |
+Todas las rutas van bajo `/api` (`config/local.js` define `prefix: '/api'`, aplicado a todo `config/routes.js` vía `addGlobalPrefix()`). Esto aplica igual en local y en producción.
 
 ---
 
-## Autenticación
+## Deploy (Render)
 
-El flujo de autenticación usa JWT almacenado en `localStorage`. El boot file de Axios intercepta cada request para inyectar el token en el header `Authorization: Bearer <token>`.
-
-El router guard en `router/index.js` protege todas las rutas privadas y redirige al login si no hay sesión activa.
+El servicio en Render corre `npm run dev`/`node app.js` (no `sails lift`). Variables de entorno configuradas en el dashboard de Render, igual que en `.env.example`.
 
 ---
 
-## Tema y modo oscuro
+## Frontend relacionado
 
-Quasar gestiona el modo oscuro/claro mediante `$q.dark`. El usuario puede alternar el tema desde la barra de navegación; la preferencia se persiste en `localStorage`.
-
-Los tokens de color se definen en `src/css/quasar.variables.scss` y se aplican globalmente a través del sistema de tema de Quasar.
-
----
-
-## Backend relacionado
-
-Este repositorio es solo el frontend. El backend (Sails.js + Node.js) se encuentra en:
-
-```
-https://github.com/tu-org/devspace-backend
-```
-
-Documentación de la API disponible en el README del backend.
-
----
-
-## Contribuir
-
-1. Crea un branch desde `develop`: `git checkout -b feature/nombre-feature`
-2. Haz tus cambios y escribe commits descriptivos
-3. Abre un Pull Request hacia `develop`
-4. El PR requiere al menos una revisión antes de hacer merge
-
----
-
-## Licencia
-
-MIT © Cubits YC
+El frontend (Vue 3 + Quasar) vive en `app-devspace-front-end/` dentro del mismo workspace, con su propio `README.md`.

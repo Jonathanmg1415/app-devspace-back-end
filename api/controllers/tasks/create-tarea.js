@@ -31,14 +31,14 @@ module.exports = {
       const created = await Task.create({ ...data, project: projectId, owner: this.req.user.id }).fetch();
       const item = await Task.findOne({ id: created.id }).populate('assignee');
 
-      sails.helpers.logActivity({
+      sails.helpers.logActivity.with({
         projectId: Number(projectId),
         actorId:   this.req.user.id,
         action:    'created',
         entity:    'task',
         entityId:  item.id,
         meta:      { title: item.title },
-      }).catch(() => {});
+      }).catch((err) => sails.log.warn('logActivity falló (ignorado):', err.message));
 
       return exits.success({ tarea: item });
     } catch (error) {

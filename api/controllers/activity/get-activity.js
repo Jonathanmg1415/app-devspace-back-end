@@ -22,10 +22,24 @@ module.exports = {
       const isMember = await ProjectMember.findOne({ project: projectId, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
 
-      const events = await Activity.find({ project: projectId })
-        .populate('actor')
+      const rows = await Activity.find({ project: projectId })
         .sort('createdAt DESC')
         .limit(limit);
+
+      // activity.id/project/actor/entityId son bigint en la base (a diferencia del
+      // resto de las tablas, que usan integer) — el driver de pg los devuelve como
+      // string, lo que rompe el match interno de Waterline en `.populate()`.
+      const actorIds = [...new Set(rows.map((r) => Number(r.actor)))];
+      const actors    = await User.find({ id: actorIds });
+      const byId      = new Map(actors.map((u) => [u.id, u]));
+
+      const events = rows.map((r) => ({
+        ...r,
+        id:       Number(r.id),
+        project:  Number(r.project),
+        entityId: r.entityId === null ? null : Number(r.entityId),
+        actor:    byId.get(Number(r.actor)) || null,
+      }));
 
       return exits.success({ events });
     } catch (error) {

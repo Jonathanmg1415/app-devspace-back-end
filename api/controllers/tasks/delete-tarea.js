@@ -18,6 +18,7 @@ module.exports = {
       const isOwner  = project.owner === this.req.user.id;
       const isMember = await ProjectMember.findOne({ project: exists.project, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
+      await TaskComment.destroy({ task: id });
       await Task.destroyOne({ id });
       return exits.success({ mensaje: 'Tarea eliminada correctamente.' });
     } catch (error) {

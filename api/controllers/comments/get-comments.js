@@ -21,9 +21,21 @@ module.exports = {
       const isMember = await ProjectMember.findOne({ project: task.project, user: this.req.user.id });
       if (!isOwner && !isMember) return exits.notFound();
 
-      const comments = await TaskComment.find({ task: taskId })
-        .populate('author')
-        .sort('createdAt ASC');
+      const rows = await TaskComment.find({ task: taskId }).sort('createdAt ASC');
+
+      // task_comment.author es bigint en la base (a diferencia del resto de las tablas,
+      // que usan integer) — el driver de pg devuelve bigint como string en JS, lo que
+      // rompe el match interno de Waterline en `.populate()`. Se resuelve a mano.
+      const authorIds = [...new Set(rows.map((r) => Number(r.author)))];
+      const authors    = await User.find({ id: authorIds });
+      const byId       = new Map(authors.map((u) => [u.id, u]));
+
+      const comments = rows.map((r) => ({
+        ...r,
+        id:     Number(r.id),
+        task:   Number(r.task),
+        author: byId.get(Number(r.author)) || null,
+      }));
 
       return exits.success({ comments });
     } catch (error) {
