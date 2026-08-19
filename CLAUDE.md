@@ -30,7 +30,7 @@ activity, ai, auth, calendar, cards, commands, comments, events, files, health, 
 `api/policies/isAuthenticated.js`: valida JWT Bearer (`jsonwebtoken` + `JWT_SECRET`), adjunta `req.user`.
 
 ## IA
-Solo Groq SDK (`groq-sdk`, modelo `llama-3.1-8b-instant`), en `api/controllers/ai/generate-document.js`, usado tanto para descripciones de comandos como para generación de documentos. **No hay Anthropic SDK en este backend** — no asumir ni introducir uso de Claude/Anthropic aquí.
+Groq vía https nativo (`api/helpers/groq.js`, sin SDK — el `groq-sdk` chocaba con el `undici` interno de Node). Modelo `qwen/qwen3.6-27b` en `api/controllers/ai/generate-document.js` (generación de documentos) y en `api/controllers/tasks/extract-from-file.js` (extracción de tareas desde imagen/docx, con visión). Es un modelo "thinking" — siempre mandar `reasoningEffort: 'none'`, si no gasta el `max_tokens` razonando antes de responder. **No hay Anthropic SDK en este backend** — no asumir ni introducir uso de Claude/Anthropic aquí. Los modelos de Groq se deprecan con frecuencia — si un endpoint de IA empieza a fallar con `model_not_found`, confirmar el catálogo vigente contra `GET https://api.groq.com/openai/v1/models` antes de asumir cualquier otra causa.
 
 ## Config
 - `config/datastores.js`: adapter `sails-postgresql`, `url` desde `DATABASE_URL`, `ssl: { rejectUnauthorized: false }`.

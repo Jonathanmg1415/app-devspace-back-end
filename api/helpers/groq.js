@@ -48,7 +48,7 @@ module.exports = {
 
   inputs: {
     messages:        { type: 'ref',     required: true, description: 'Array de mensajes estilo OpenAI (role/content). content puede ser string o array de partes para visión.' },
-    model:           { type: 'string',  defaultsTo: 'llama-3.1-8b-instant' },
+    model:           { type: 'string',  defaultsTo: 'qwen/qwen3.6-27b' },
     maxTokens:       { type: 'number',  defaultsTo: 1500 },
     jsonMode:        { type: 'boolean', defaultsTo: false },
     reasoningEffort: { type: 'string',  description: 'Para modelos "thinking" (ej. Qwen): "none" evita el preámbulo de razonamiento que puede comerse el max_tokens antes de llegar a la respuesta.' },
