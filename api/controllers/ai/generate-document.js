@@ -20,8 +20,6 @@ module.exports = {
         : prompt;
 
       const content = await sails.helpers.groq.with({
-        model:           'qwen/qwen3.6-27b',
-        reasoningEffort: 'none',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user',   content: userPrompt },

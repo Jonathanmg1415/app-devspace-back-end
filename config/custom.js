@@ -7,4 +7,5 @@ module.exports.custom = {
   fromEmail:        process.env.FROM_EMAIL        || 'onboarding@resend.dev',
   resendOwnerEmail: process.env.RESEND_OWNER_EMAIL || 'jonathang1415@gmail.com',
   appUrl:           process.env.APP_URL           || 'http://localhost:9000',
+  groqModel:        process.env.GROQ_MODEL         || 'qwen/qwen3.6-27b',
 };

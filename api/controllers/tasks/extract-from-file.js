@@ -1,8 +1,7 @@
 const mammoth = require('mammoth');
 
-const VISION_MODEL = 'qwen/qwen3.6-27b';
-const TEXT_MODEL    = 'qwen/qwen3.6-27b';
-
+// Usa sails.config.custom.groqModel (env var GROQ_MODEL) para ambos casos —
+// si se cambia a un modelo sin soporte de visión, el path de imagen deja de funcionar.
 const IMAGE_MIMETYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 const DOCX_MIMETYPE   = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
@@ -73,9 +72,7 @@ module.exports = {
       if (IMAGE_MIMETYPES.includes(received.type)) {
         const base64 = buffer.toString('base64');
         tasksRaw = await sails.helpers.groq.with({
-          model:           VISION_MODEL,
-          jsonMode:        true,
-          reasoningEffort: 'none',
+          jsonMode: true,
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             {
@@ -91,9 +88,7 @@ module.exports = {
         const { value: text } = await mammoth.extractRawText({ buffer });
         if (!text.trim()) return exits.invalidType({ mensaje: 'El documento no tiene texto para analizar.' });
         tasksRaw = await sails.helpers.groq.with({
-          model:           TEXT_MODEL,
-          jsonMode:        true,
-          reasoningEffort: 'none',
+          jsonMode: true,
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: `Extraé las tareas de este documento:\n\n${text.slice(0, 12000)}` },

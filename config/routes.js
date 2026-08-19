@@ -87,6 +87,7 @@ module.exports.routes = addGlobalPrefix({
 
   // IA - generacion de documentos
   'POST /ai/generate': { action: 'ai/generate-document' },
+  'POST /ai/describe-command': { action: 'ai/describe-command' },
 
   // NOTIFICACIONES
   'GET    /notifications':          { action: 'notifications/get-notifications' },

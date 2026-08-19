@@ -30,11 +30,21 @@ activity, ai, auth, calendar, cards, commands, comments, events, files, health, 
 `api/policies/isAuthenticated.js`: valida JWT Bearer (`jsonwebtoken` + `JWT_SECRET`), adjunta `req.user`.
 
 ## IA
-Groq vía https nativo (`api/helpers/groq.js`, sin SDK — el `groq-sdk` chocaba con el `undici` interno de Node). Modelo `qwen/qwen3.6-27b` en `api/controllers/ai/generate-document.js` (generación de documentos) y en `api/controllers/tasks/extract-from-file.js` (extracción de tareas desde imagen/docx, con visión). Es un modelo "thinking" — siempre mandar `reasoningEffort: 'none'`, si no gasta el `max_tokens` razonando antes de responder. **No hay Anthropic SDK en este backend** — no asumir ni introducir uso de Claude/Anthropic aquí. Los modelos de Groq se deprecan con frecuencia — si un endpoint de IA empieza a fallar con `model_not_found`, confirmar el catálogo vigente contra `GET https://api.groq.com/openai/v1/models` antes de asumir cualquier otra causa.
+Groq vía https nativo (`api/helpers/groq.js`, sin SDK — el `groq-sdk` chocaba con el `undici` interno de Node). El modelo **no está hardcodeado**: `sails.config.custom.groqModel` (env var `GROQ_MODEL`, default `qwen/qwen3.6-27b` en `config/custom.js`) — si Groq deprecia el modelo, se cambia el env var en Render, sin tocar código ni redeployar. El helper manda `reasoning_effort: 'none'` por default (es un modelo "thinking"; sin esto gasta el `max_tokens` razonando antes de responder) — pasar otro valor si se configura un modelo que no acepte `'none'`.
+- `api/controllers/ai/generate-document.js` — generación de documentos.
+- `api/controllers/ai/describe-command.js` — descripción de comandos (antes era una llamada directa a Groq desde el frontend con la key expuesta en el bundle; ahora pasa por acá).
+- `api/controllers/tasks/extract-from-file.js` — extracción de tareas desde imagen/docx (usa el mismo modelo también para visión — si se cambia `GROQ_MODEL` a algo sin soporte de imágenes, este endpoint se rompe).
+
+Si un endpoint de IA falla con `model_not_found`, confirmar el catálogo vigente contra `GET https://api.groq.com/openai/v1/models` antes de asumir cualquier otra causa — Groq deprecia modelos con frecuencia.
+
+**No hay Anthropic SDK en este backend** — no asumir ni introducir uso de Claude/Anthropic aquí.
+
+## Rate limiting
+`api/policies/rate-limit-{login,register,forgot-password}.js` (via `express-rate-limit`, en memoria — si el servicio corre con más de una instancia en Render esto no comparte estado entre instancias). Login: 10/15min, registro: 5/hora, forgot-password: 5/hora, todos por IP.
 
 ## Config
 - `config/datastores.js`: adapter `sails-postgresql`, `url` desde `DATABASE_URL`, `ssl: { rejectUnauthorized: false }`.
-- Otras deps relevantes: `@supabase/supabase-js` (storage), `bcryptjs`, `resend` + `nodemailer` (email), `jsonwebtoken`, `joi`.
+- Otras deps relevantes: `@supabase/supabase-js` (storage), `bcryptjs`, `nodemailer` (sin uso activo — el envío real de emails es Resend vía https nativo en `api/helpers/mailer.js`), `jsonwebtoken`, `joi`, `mammoth` (extracción de texto de .docx).
 
 ## Deploy
 Render (ver CLAUDE.md raíz para la postura de seguridad sobre acciones MCP en Render).

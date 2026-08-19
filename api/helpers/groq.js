@@ -48,10 +48,10 @@ module.exports = {
 
   inputs: {
     messages:        { type: 'ref',     required: true, description: 'Array de mensajes estilo OpenAI (role/content). content puede ser string o array de partes para visión.' },
-    model:           { type: 'string',  defaultsTo: 'qwen/qwen3.6-27b' },
+    model:           { type: 'string',  description: 'Si se omite, usa sails.config.custom.groqModel (env var GROQ_MODEL) — así un modelo deprecado se cambia sin tocar código.' },
     maxTokens:       { type: 'number',  defaultsTo: 1500 },
     jsonMode:        { type: 'boolean', defaultsTo: false },
-    reasoningEffort: { type: 'string',  description: 'Para modelos "thinking" (ej. Qwen): "none" evita el preámbulo de razonamiento que puede comerse el max_tokens antes de llegar a la respuesta.' },
+    reasoningEffort: { type: 'string',  description: 'Para modelos "thinking" (ej. Qwen): "none" evita el preámbulo de razonamiento que puede comerse el max_tokens antes de llegar a la respuesta. Por defecto "none" — pasar otro valor (low/medium/high) si el modelo configurado lo requiere.' },
   },
 
   exits: {
@@ -66,12 +66,12 @@ module.exports = {
 
     try {
       const body = {
-        model,
+        model: model || sails.config.custom.groqModel,
         messages,
         max_tokens: maxTokens,
       };
       if (jsonMode) body.response_format = { type: 'json_object' };
-      if (reasoningEffort) body.reasoning_effort = reasoningEffort;
+      body.reasoning_effort = reasoningEffort || 'none';
 
       const json = await request(apiKey, body);
       const content = json.choices?.[0]?.message?.content || '';
