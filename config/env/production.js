@@ -26,7 +26,11 @@ module.exports = {
   },
 
   http: {
-    trustProxy: true,
+    // Render pone exactamente un proxy reverso delante de la app — con `true` (todos
+    // los proxies) Express confía en el X-Forwarded-For sin límite, que cualquiera
+    // puede falsear, así que express-rate-limit lo rechaza en vez de usarlo (rompía
+    // login/registro/forgot-password en prod). `1` = confiar solo en ese único hop.
+    trustProxy: 1,
     middleware: {
       order: [
         "cookieParser",
