@@ -9,5 +9,6 @@ module.exports = {
     color:       { type: 'string',  defaultsTo: '#F97316' },
     owner:       { model: 'user',   required: true },
     project:     { model: 'project' },
+    calendar:    { model: 'calendar', required: true },
   },
 };

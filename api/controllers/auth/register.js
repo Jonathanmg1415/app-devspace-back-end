@@ -54,6 +54,13 @@ module.exports = {
         password: hashed,
       }).fetch();
 
+      Calendar.create({
+        name: 'Personal',
+        color: '#F97316',
+        owner: user.id,
+        isDefault: true,
+      }).catch((err) => sails.log.warn('No se pudo crear el calendario Personal por defecto', err.message));
+
       const token = jwt.sign({ id: user.id }, sails.config.custom.jwtSecret, {
         expiresIn: "30d",
       });

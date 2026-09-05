@@ -98,14 +98,27 @@ module.exports.routes = addGlobalPrefix({
   // DASHBOARD
   'GET /projects/summary': { action: 'projects/get-summary' },
 
-  // EVENTOS / CALENDARIO
+  // EVENTOS
   'GET    /events':             { action: 'events/get-events' },
   'POST   /events':             { action: 'events/create-event' },
   'PUT    /events/edit':        { action: 'events/edit-event' },
   'DELETE /events/delete':      { action: 'events/delete-event' },
-  'GET    /calendar/members':   { action: 'calendar/get-members' },
-  'POST   /calendar/invite':    { action: 'calendar/invite-member' },
-  'DELETE /calendar/member':    { action: 'calendar/remove-member' },
+
+  // CALENDARIOS
+  'GET    /calendars':          { action: 'calendars/get-calendars' },
+  'POST   /calendars':          { action: 'calendars/create-calendar' },
+  'PUT    /calendars/edit':     { action: 'calendars/edit-calendar' },
+  'DELETE /calendars/delete':   { action: 'calendars/delete-calendar' },
+  'GET    /calendars/members':  { action: 'calendars/get-members' },
+  'POST   /calendars/invite':   { action: 'calendars/invite-member' },
+  'DELETE /calendars/member':   { action: 'calendars/remove-member' },
+
+  // TAREAS DE DÍA
+  'GET    /day-tasks':          { action: 'day-tasks/get-day-tasks' },
+  'POST   /day-tasks':          { action: 'day-tasks/create-day-task' },
+  'PUT    /day-tasks/edit':     { action: 'day-tasks/edit-day-task' },
+  'PUT    /day-tasks/toggle':   { action: 'day-tasks/toggle-day-task' },
+  'DELETE /day-tasks/delete':   { action: 'day-tasks/delete-day-task' },
 
   // HEALTH
   'GET /health': { action: 'health/ping' },

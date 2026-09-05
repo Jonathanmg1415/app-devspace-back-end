@@ -1,7 +1,7 @@
 module.exports = {
   tableName: 'calendar_member',
   attributes: {
-    user:  { model: 'user', required: true },
-    owner: { model: 'user', required: true },
+    calendar: { model: 'calendar', required: true },
+    user:     { model: 'user',     required: true },
   },
 };
