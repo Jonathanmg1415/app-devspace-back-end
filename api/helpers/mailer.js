@@ -1,8 +1,11 @@
 const https = require('https');
 
+const REQUEST_TIMEOUT_MS = 15000; // si Resend no responde en 15s, fallar en vez de colgar la request para siempre
+
 function sendViaResend(apiKey, body) {
   return new Promise((resolve, reject) => {
     const payload = Buffer.from(JSON.stringify(body));
+    let settled = false;
 
     const req = https.request(
       {
@@ -10,6 +13,7 @@ function sendViaResend(apiKey, body) {
         port: 443,
         path: '/emails',
         method: 'POST',
+        timeout: REQUEST_TIMEOUT_MS,
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
@@ -20,6 +24,8 @@ function sendViaResend(apiKey, body) {
         const chunks = [];
         res.on('data', (c) => chunks.push(c));
         res.on('end', () => {
+          if (settled) return;
+          settled = true;
           const raw = Buffer.concat(chunks).toString();
           let json;
           try {
@@ -35,7 +41,21 @@ function sendViaResend(apiKey, body) {
       }
     );
 
-    req.on('error', reject);
+    // El evento 'timeout' solo avisa que el socket está inactivo — no aborta
+    // la request por sí solo, hay que destruirla a mano o queda colgada igual.
+    req.on('timeout', () => {
+      if (settled) return;
+      settled = true;
+      req.destroy();
+      reject(new Error(`Resend no respondió en ${REQUEST_TIMEOUT_MS / 1000}s (timeout)`));
+    });
+
+    req.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      reject(err);
+    });
+
     req.write(payload);
     req.end();
   });

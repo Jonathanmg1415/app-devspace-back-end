@@ -1,6 +1,8 @@
 const https = require('https');
 const { URL } = require('url');
 
+const REQUEST_TIMEOUT_MS = 30000; // uploads pueden ser grandes (hasta 15MB) — si Supabase no responde en 30s, fallar en vez de colgar la request para siempre
+
 function request(method, urlStr, body, extraHeaders) {
   return new Promise((resolve, reject) => {
     const u = new URL(urlStr);
@@ -8,12 +10,14 @@ function request(method, urlStr, body, extraHeaders) {
     const bodyBuf  = body
       ? (isBuffer ? body : Buffer.from(typeof body === 'string' ? body : JSON.stringify(body)))
       : null;
+    let settled = false;
 
     const options = {
       hostname: u.hostname,
       port:     443,
       path:     u.pathname + u.search,
       method,
+      timeout:  REQUEST_TIMEOUT_MS,
       headers:  {
         ...extraHeaders,
         ...(bodyBuf ? { 'Content-Length': bodyBuf.length } : {}),
@@ -23,10 +27,28 @@ function request(method, urlStr, body, extraHeaders) {
     const req = https.request(options, (res) => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve({ ok: res.statusCode < 300, status: res.statusCode, body: Buffer.concat(chunks).toString() }));
+      res.on('end', () => {
+        if (settled) return;
+        settled = true;
+        resolve({ ok: res.statusCode < 300, status: res.statusCode, body: Buffer.concat(chunks).toString() });
+      });
     });
 
-    req.on('error', reject);
+    // El evento 'timeout' solo avisa que el socket está inactivo — no aborta
+    // la request por sí solo, hay que destruirla a mano o queda colgada igual.
+    req.on('timeout', () => {
+      if (settled) return;
+      settled = true;
+      req.destroy();
+      reject(new Error(`Supabase Storage no respondió en ${REQUEST_TIMEOUT_MS / 1000}s (timeout)`));
+    });
+
+    req.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      reject(err);
+    });
+
     if (bodyBuf) req.write(bodyBuf);
     req.end();
   });

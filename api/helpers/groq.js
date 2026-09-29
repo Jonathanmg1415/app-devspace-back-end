@@ -1,8 +1,11 @@
 const https = require('https');
 
+const REQUEST_TIMEOUT_MS = 30000; // si Groq no responde en 30s, fallar en vez de colgar la request para siempre
+
 function request(apiKey, body) {
   return new Promise((resolve, reject) => {
     const payload = Buffer.from(JSON.stringify(body));
+    let settled = false;
 
     const req = https.request(
       {
@@ -10,6 +13,7 @@ function request(apiKey, body) {
         port: 443,
         path: '/openai/v1/chat/completions',
         method: 'POST',
+        timeout: REQUEST_TIMEOUT_MS,
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
@@ -20,6 +24,8 @@ function request(apiKey, body) {
         const chunks = [];
         res.on('data', (c) => chunks.push(c));
         res.on('end', () => {
+          if (settled) return;
+          settled = true;
           const raw = Buffer.concat(chunks).toString();
           let json;
           try {
@@ -36,7 +42,21 @@ function request(apiKey, body) {
       }
     );
 
-    req.on('error', reject);
+    // El evento 'timeout' solo avisa que el socket está inactivo — no aborta
+    // la request por sí solo, hay que destruirla a mano o queda colgada igual.
+    req.on('timeout', () => {
+      if (settled) return;
+      settled = true;
+      req.destroy();
+      reject(new Error(`Groq no respondió en ${REQUEST_TIMEOUT_MS / 1000}s (timeout)`));
+    });
+
+    req.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      reject(err);
+    });
+
     req.write(payload);
     req.end();
   });
