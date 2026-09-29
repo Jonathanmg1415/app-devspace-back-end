@@ -1,7 +1,8 @@
 const mammoth = require('mammoth');
 
-// Usa sails.config.custom.groqModel (env var GROQ_MODEL) para ambos casos —
-// si se cambia a un modelo sin soporte de visión, el path de imagen deja de funcionar.
+// El path de imagen pasa requireVision:true al helper groq — si el modelo configurado
+// (GROQ_MODEL) no soporta imágenes o fue desactivado, el helper reintenta automáticamente
+// con el siguiente modelo del catálogo que sí soporte visión (ver api/helpers/groq.js).
 const IMAGE_MIMETYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 const DOCX_MIMETYPE   = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
@@ -73,6 +74,7 @@ module.exports = {
         const base64 = buffer.toString('base64');
         tasksRaw = await sails.helpers.groq.with({
           jsonMode: true,
+          requireVision: true,
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             {
