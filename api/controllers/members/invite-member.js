@@ -43,7 +43,7 @@ module.exports = {
         });
         await sails.helpers.mailer.with({
           to:      target.email,
-          subject: `Te invitaron al proyecto ${project.name} en DevSpace`,
+          subject: `Le invitaron al proyecto ${project.name} en DevSpace`,
           html,
         });
       } catch (mailErr) {
@@ -53,8 +53,8 @@ module.exports = {
       Notification.create({
         recipient:  target.id,
         type:       'project_invitation',
-        title:      `${this.req.user.name} te agregó al proyecto ${project.name}`,
-        body:       'Ya puedes ver y colaborar en este proyecto',
+        title:      `${this.req.user.name} le agregó al proyecto ${project.name}`,
+        body:       'Ya puede ver y colaborar en este proyecto',
         entityType: 'project',
         entityId:   project.id,
         project:    project.id,

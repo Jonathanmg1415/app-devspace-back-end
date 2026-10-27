@@ -32,10 +32,10 @@ module.exports = {
         <!-- Body -->
         <tr><td style="padding:32px 40px">
           <p style="margin:0 0 16px;font-size:24px;font-weight:700;color:#F1F1F3;line-height:1.3">
-            Recupera tu contraseña
+            Recupere su contraseña
           </p>
           <p style="margin:0 0 24px;font-size:15px;color:#A0A0B0;line-height:1.6">
-            Recibimos una solicitud para restablecer la contraseña de tu cuenta en DevSpace.
+            Recibimos una solicitud para restablecer la contraseña de su cuenta en DevSpace.
             Este enlace expira en <strong style="color:#F1F1F3">1 hora</strong>.
           </p>
 
@@ -46,14 +46,14 @@ module.exports = {
           </a>
 
           <p style="margin:24px 0 0;font-size:13px;color:#5A5A70">
-            Si no solicitaste esto, ignora este email. Tu contraseña no cambiará.
+            Si no solicitó esto, ignore este correo. Su contraseña no cambiará.
           </p>
         </td></tr>
 
         <!-- Footer -->
         <tr><td style="padding:20px 40px;border-top:1px solid rgba(255,255,255,0.06)">
           <p style="margin:0;font-size:12px;color:#5A5A70">
-            DevSpace · Tu workspace técnico personal
+            DevSpace · Su workspace técnico personal
           </p>
         </td></tr>
 

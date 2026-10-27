@@ -31,7 +31,7 @@ module.exports = {
       const html = await sails.helpers.templates.resetPasswprdEmail.with({ resetUrl });
       await sails.helpers.mailer.with({
         to:      user.email,
-        subject: 'Recupera tu contraseña en DevSpace',
+        subject: 'Recupere su contraseña en DevSpace',
         html,
       });
 

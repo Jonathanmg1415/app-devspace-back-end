@@ -67,7 +67,7 @@ module.exports = {
     const key = sails.config.custom.supabaseKey;
 
     if (!url || !key) {
-      throw new Error('Supabase no configurado: verifica SUPABASE_URL y SUPABASE_SERVICE_KEY en las variables de entorno');
+      throw new Error('Supabase no configurado: verifique SUPABASE_URL y SUPABASE_SERVICE_KEY en las variables de entorno');
     }
 
     const authHeaders = {

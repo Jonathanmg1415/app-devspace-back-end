@@ -49,7 +49,7 @@ module.exports = {
         Notification.create({
           recipient:  newAssigneeId,
           type:       'task_assigned',
-          title:      `Te asignaron: ${populated.title}`,
+          title:      `Le asignaron: ${populated.title}`,
           body:       `En el proyecto ${project.name}`,
           entityType: 'task',
           entityId:   populated.id,
@@ -65,7 +65,7 @@ module.exports = {
             projectName:  project.name,
             appUrl:       sails.config.custom.appUrl || 'https://devspace.app',
           });
-          sails.helpers.mailer({ to: assignee.email, subject: `Te asignaron una tarea en ${project.name}`, html })
+          sails.helpers.mailer({ to: assignee.email, subject: `Le asignaron una tarea en ${project.name}`, html })
             .catch(err => sails.log.warn('Email no enviado:', err.message));
         }
       }

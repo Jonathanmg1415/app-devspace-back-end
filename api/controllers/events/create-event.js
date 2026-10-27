@@ -19,7 +19,7 @@ module.exports = {
     const { project, calendar, ...data } = inputs;
 
     const hasAccess = await sails.helpers.hasCalendarAccess.with({ calendarId: calendar, userId: this.req.user.id });
-    if (!hasAccess) return exits.forbidden({ mensaje: 'No tenés acceso a ese calendario.' });
+    if (!hasAccess) return exits.forbidden({ mensaje: 'No tiene acceso a ese calendario.' });
 
     const payload = { ...data, owner: this.req.user.id, calendar };
     if (project) payload.project = project;

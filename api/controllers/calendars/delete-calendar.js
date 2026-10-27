@@ -17,7 +17,7 @@ module.exports = {
       const calendar = await Calendar.findOne({ id, owner: this.req.user.id });
       if (!calendar) return exits.notFound();
       if (calendar.isDefault) {
-        return exits.conflict({ mensaje: 'No se puede borrar el calendario por defecto — podés renombrarlo en cambio.' });
+        return exits.conflict({ mensaje: 'No se puede borrar el calendario predeterminado; puede renombrarlo en su lugar.' });
       }
 
       await Calendar.getDatastore().transaction(async (db) => {

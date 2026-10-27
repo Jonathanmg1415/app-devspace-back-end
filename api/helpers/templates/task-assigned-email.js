@@ -35,10 +35,10 @@ module.exports = {
         <tr><td style="padding:32px 40px">
           <p style="margin:0 0 8px;font-size:13px;color:#9CA3AF">Hola, ${assigneeName}</p>
           <p style="margin:0 0 16px;font-size:24px;font-weight:700;color:#F1F1F3;line-height:1.3">
-            Te asignaron una tarea
+            Le asignaron una tarea
           </p>
           <p style="margin:0 0 24px;font-size:15px;color:#A0A0B0;line-height:1.6">
-            <strong style="color:#F1F1F3">${assignerName}</strong> te asignó la tarea
+            <strong style="color:#F1F1F3">${assignerName}</strong> le asignó la tarea
             <strong style="color:#F97316">${taskTitle}</strong>
             en el proyecto <strong style="color:#F1F1F3">${projectName}</strong>.
           </p>
@@ -52,7 +52,7 @@ module.exports = {
 
         <tr><td style="padding:20px 40px;border-top:1px solid rgba(255,255,255,0.06)">
           <p style="margin:0;font-size:12px;color:#5A5A70">
-            Si no esperabas esta notificación puedes ignorar este email.
+            Si no esperaba esta notificación, puede ignorar este correo.
           </p>
         </td></tr>
 
